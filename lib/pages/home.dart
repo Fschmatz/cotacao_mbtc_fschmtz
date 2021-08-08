@@ -1,4 +1,4 @@
-import 'package:cotacao_mbtc_fschmtz/configs/settingsPage.dart';
+import 'package:cotacao_mbtc_fschmtz/configs/pgConfigs.dart';
 import 'package:cotacao_mbtc_fschmtz/widgets/coinCard.dart';
 import 'package:flutter/material.dart';
 
@@ -9,13 +9,31 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   //DOCS -> https://www.mercadobitcoin.com.br/api-doc/
+  //INTERNACIONAL COIN STATS -> https://documenter.getpostman.com/view/5734027/RzZ6Hzr3?version=latest
+
+  List<Widget> _coinCards = [
+    CoinCard(
+        key: UniqueKey(),
+        coinNameMbtc: 'BTC',
+        coinNameInternacional: 'bitcoin'),
+    CoinCard(
+        key: UniqueKey(),
+        coinNameMbtc: 'ETH',
+        coinNameInternacional: 'ethereum'),
+    CoinCard(
+        key: UniqueKey(),
+        coinNameMbtc: 'LTC',
+        coinNameInternacional: 'litecoin'),
+    CoinCard(
+        key: UniqueKey(), coinNameMbtc: 'XRP', coinNameInternacional: 'ripple'),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        title: Text('Cotação mBTC'),
+        title: Text('Cotação MBTC + Internacional'),
         actions: [
           IconButton(
               icon: Icon(
@@ -30,35 +48,28 @@ class _HomeState extends State<Home> {
                 Navigator.push(
                     context,
                     MaterialPageRoute<void>(
-                      builder: (BuildContext context) => SettingsPage(),
+                      builder: (BuildContext context) => PgConfigs(),
                       fullscreenDialog: true,
                     ));
               }),
         ],
       ),
-      body: ListView(
-          physics: ClampingScrollPhysics(),
+      body: ListView(physics: AlwaysScrollableScrollPhysics(), children: [
+        ListView.separated(
+          separatorBuilder: (BuildContext context, int index) => const Divider(
+            height: 0,
+          ),
+          physics: NeverScrollableScrollPhysics(),
           shrinkWrap: true,
-          children: [
-            GridView.count(
-              shrinkWrap: true,
-              primary: false,
-              padding: const EdgeInsets.fromLTRB(16, 5, 16, 5),
-              childAspectRatio: 0.84,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              crossAxisCount: 2,
-              children: <Widget>[
-                CoinCard(coinName: 'BTC'),
-                CoinCard(coinName: 'ETH'),
-                CoinCard(coinName: 'LTC'),
-                CoinCard(coinName: 'XRP'),
-              ],
-            ),
-            const SizedBox(
-              height: 20,
-            )
-          ]),
+          itemCount: _coinCards.length,
+          itemBuilder: (context, index) {
+            return _coinCards[index];
+          },
+        ),
+        const SizedBox(
+          height: 20,
+        )
+      ]),
     );
   }
 }

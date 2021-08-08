@@ -32,7 +32,7 @@ ThemeData light = ThemeData(
 ThemeData dark = ThemeData(
   brightness: Brightness.dark,
   primaryColor: Color(0xFF202022),
-  accentColor: Colors.amber,
+  accentColor: Colors.amberAccent,
   scaffoldBackgroundColor: Color(0xFF202022),
   cardTheme: CardTheme(
     color: Color(0xFF303032),
@@ -50,7 +50,7 @@ ThemeData dark = ThemeData(
 
   bottomAppBarColor: Color(0xFF151517),
   accentTextTheme: TextTheme(
-    headline1: TextStyle(color:Colors.amber),
+    headline1: TextStyle(color:Colors.amberAccent),
     headline2: TextStyle(color: Color(0xFF000000)),
   ),
 );
