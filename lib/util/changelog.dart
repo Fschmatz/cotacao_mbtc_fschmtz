@@ -1,15 +1,20 @@
 class Changelog{
 
-  static String appVersion = "1.0.1";
+  static String appVersion = "1.1.0";
   static String appName = "MBTC + Internacional";
 
   static String changelogCurrent = '''  
-1.0.1
-- Tecnicamente Usável  
-- Mudanças na Home
+1.1.0
+- Swipe Down Refresh Home
+- Formatação Valores Padrão PT-BR
+- Correções
 ''';
 
   static String changelogsOld = '''
+1.0.0
+- Tecnicamente Usável  
+- Mudanças na Home
+
 0.5.0
 - API Cotação Dólar
 
@@ -26,7 +31,7 @@ class Changelog{
 - API
   
 0.1.0
-- Inicio do Projeto
+- Início do Projeto
 ''';
 
 }

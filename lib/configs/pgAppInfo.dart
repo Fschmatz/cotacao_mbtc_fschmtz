@@ -97,7 +97,9 @@ class PgAppInfo extends StatelessWidget {
 Money
 It's a crime
 Share it fairly
-But don't take a slice of my pie         
+But don't take a slice of my pie 
+
+Pink Floyd        
       ''',
               style: TextStyle(fontSize: 16),
             ),

@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 class CoinCard extends StatefulWidget {
   String coinNameMbtc;
   String coinNameInternacional;
-  //String valorCotacaoDolar;
 
   CoinCard(
       {Key? key,
@@ -21,14 +20,16 @@ class CoinCard extends StatefulWidget {
 }
 
 class _CoinCardState extends State<CoinCard> {
+
   late CoinMBTC coinMbtc;
   late CoinInternacional coinInternacional;
   String urlCoinApiMbtc = '';
   String urlCoinApiInternacional = '';
   bool loading = true;
   TextStyle valuesStyle = TextStyle(fontSize: 16);
-  double valorDolar = 0;
   String horaFormatada = ' ';
+  Color corMudancasValor = Colors.transparent;
+  NumberFormat formatter = NumberFormat.simpleCurrency(locale: 'pt_BR');
 
   @override
   void initState() {
@@ -36,7 +37,7 @@ class _CoinCardState extends State<CoinCard> {
         'https://www.mercadobitcoin.net/api/${widget.coinNameMbtc}/ticker/';
     urlCoinApiInternacional =
         'https://api.coinstats.app/public/v1/coins/${widget.coinNameInternacional}?currency=USD';
-    getCoinData();
+    getCoinData(false);
     super.initState();
   }
 
@@ -44,7 +45,7 @@ class _CoinCardState extends State<CoinCard> {
     return DateFormat.Hm().format(DateTime.now());
   }
 
-  Future<void> getCoinData() async {
+  Future<void> getCoinData(bool checkParaCor) async {
     horaFormatada = getHoraFormatada();
     bool doneMbtc = false;
     bool doneInternacional = false;
@@ -56,6 +57,15 @@ class _CoinCardState extends State<CoinCard> {
       doneMbtc = true;
       CoinMBTC dataMbtc = CoinMBTC.fromJSON(jsonDecode(responseMbtc.body));
       setState(() {
+
+        if(checkParaCor) {
+          if (double.parse(coinMbtc.last) < double.parse(dataMbtc.last)) {
+            corMudancasValor = Colors.green;
+          }
+          else if (double.parse(coinMbtc.last) > double.parse(dataMbtc.last)) {
+            corMudancasValor = Colors.red;
+          }
+        }
         coinMbtc = dataMbtc;
       });
     }
@@ -74,17 +84,12 @@ class _CoinCardState extends State<CoinCard> {
     }
   }
 
+  String getFormattedValueMbtc() {
+    return (formatter.format(double.parse(coinMbtc.last))).replaceAll('R\$', '');
+  }
+
   String getFormattedValueInternacional() {
-    //String valueFormatted;
-    if (coinInternacional.name == 'bitcoin') {
-      return coinInternacional.value.substring(0, (coinInternacional.value.length - 9));
-    } else if (coinInternacional.name == 'ethereum') {
-      return coinInternacional.value.substring(0, (coinInternacional.value.length - 10));
-    } else if (coinInternacional.name == 'litecoin') {
-      return coinInternacional.value.substring(0, (coinInternacional.value.length - 12));
-    } else {
-      return coinInternacional.value.substring(0, (coinInternacional.value.length - 12));
-    }
+    return (formatter.format(double.parse(coinInternacional.value))).replaceAll('R\$', '');
   }
 
   @override
@@ -95,7 +100,7 @@ class _CoinCardState extends State<CoinCard> {
         borderRadius: BorderRadius.all(Radius.circular(20)),
       ),
       child: InkWell(
-        onTap: getCoinData,
+        onTap: () => getCoinData(true),
         borderRadius: BorderRadius.all(Radius.circular(20)),
         child: Column(
           children: [
@@ -118,8 +123,7 @@ class _CoinCardState extends State<CoinCard> {
                             style: valuesStyle,
                           ),
                           trailing: Text(
-                            coinMbtc.last
-                                .substring(0, (coinMbtc.last.length - 6)),
+                            getFormattedValueMbtc(),
                             style: valuesStyle,
                           ),
                         ),
@@ -134,6 +138,11 @@ class _CoinCardState extends State<CoinCard> {
                           ),
                         ),
                         ListTile(
+                          visualDensity: VisualDensity.compact,
+                          leading: Padding(
+                            padding: const EdgeInsets.fromLTRB(6, 8, 10, 5),
+                            child: Icon(Icons.circle,size: 10,color: corMudancasValor),
+                          ),
                           trailing: Text(
                             horaFormatada,
                             style: TextStyle(fontSize: 14,color: Theme.of(context)

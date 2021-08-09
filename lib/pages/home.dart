@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:cotacao_mbtc_fschmtz/class/dolar.dart';
 import 'package:cotacao_mbtc_fschmtz/configs/pgConfigs.dart';
 import 'package:cotacao_mbtc_fschmtz/widgets/coinCard.dart';
+import 'package:cotacao_mbtc_fschmtz/widgets/dolarCard.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,86 +17,24 @@ class _HomeState extends State<Home> {
   //DOLAR https://docs.awesomeapi.com.br/api-de-moedas
 
   bool loadingHome = true;
-  String urlApiDolar = 'https://economia.awesomeapi.com.br/last/USD-BRL';
-  late Dolar _dolar;
-  String valorDolarCalculado = ' ';
+  Key keyBTC = UniqueKey();
+  Key keyETH = UniqueKey();
+  Key keyLTC = UniqueKey();
+  Key keyXRP = UniqueKey();
 
-  @override
-  void initState() {
-    getValorDolar();
-    super.initState();
+  void stopLoadHome() {
+    setState(() {
+      loadingHome = false;
+    });
   }
 
-  List<Widget> _coinCards = [
-    CoinCard(
-        key: UniqueKey(),
-        coinNameMbtc: 'BTC',
-        coinNameInternacional: 'bitcoin'),
-    CoinCard(
-        key: UniqueKey(),
-        coinNameMbtc: 'ETH',
-        coinNameInternacional: 'ethereum'),
-    CoinCard(
-        key: UniqueKey(),
-        coinNameMbtc: 'LTC',
-        coinNameInternacional: 'litecoin'),
-    CoinCard(
-      key: UniqueKey(),
-      coinNameMbtc: 'XRP',
-      coinNameInternacional: 'ripple',
-    ),
-  ];
-
-  Future<void> getValorDolar() async {
-    final response = await http.get(Uri.parse(urlApiDolar));
-
-    if (response.statusCode == 200) {
-      Dolar dataDolar = Dolar.fromJSON(jsonDecode(response.body));
-      setState(() {
-        _dolar = dataDolar;
-        valorDolarCalculado =
-            ((double.parse(_dolar.high) + double.parse(_dolar.low)) / 2)
-                .toStringAsFixed(2);
-        loadingHome = false;
-      });
-    }
-  }
-
-  Widget dolarCard() {
-    String valorDolarFormatado = 'R\$ ' + valorDolarCalculado;
-
-    return Card(
-      margin: const EdgeInsets.fromLTRB(16, 10, 16, 5),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-      ),
-      child: InkWell(
-        onTap: getValorDolar,
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-        child: Container(
-          height: 55,
-          child: AnimatedSwitcher(
-            duration: Duration(milliseconds: 600),
-            child: loadingHome
-                ? Center(child: SizedBox.shrink())
-                : ListTile(
-                    title: Text(
-                      'Dólar'.toUpperCase(),
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: Theme.of(context).accentColor),
-                    ),
-                    trailing: Text(
-                      valorDolarFormatado,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-          ),
-        ),
-      ),
-    );
+  Future<void> refreshAll() async{
+    setState(() {
+      keyBTC = UniqueKey();
+      keyETH = UniqueKey();
+      keyLTC = UniqueKey();
+      keyXRP = UniqueKey();
+    });
   }
 
   @override
@@ -137,27 +76,46 @@ class _HomeState extends State<Home> {
               }),
         ],
       ),
-      body: ListView(physics: AlwaysScrollableScrollPhysics(), children: [
-        dolarCard(),
-        GridView.count(
-          shrinkWrap: true,
-          primary: false,
-          padding: const EdgeInsets.fromLTRB(12, 5, 12, 5),
-          childAspectRatio: 0.84,
-          crossAxisSpacing: 2,
-          mainAxisSpacing: 5,
-          crossAxisCount: 2,
-          children: <Widget>[
-            _coinCards[0],
-            _coinCards[1],
-            _coinCards[2],
-            _coinCards[3],
-          ],
-        ),
-        const SizedBox(
-          height: 20,
-        )
-      ]),
+      body: RefreshIndicator(
+        onRefresh: refreshAll,
+        color: Theme.of(context).accentColor,
+        child: ListView(physics: AlwaysScrollableScrollPhysics(), children: [
+          DolarCard(
+            stopLoadHome: stopLoadHome,
+          ),
+          GridView.count(
+            shrinkWrap: true,
+            primary: false,
+            padding: const EdgeInsets.fromLTRB(12, 5, 12, 5),
+            childAspectRatio: 0.9,
+            crossAxisSpacing: 4,
+            mainAxisSpacing: 6,
+            crossAxisCount: 2,
+            children: <Widget>[
+              CoinCard(
+                  key: keyBTC,
+                  coinNameMbtc: 'BTC',
+                  coinNameInternacional: 'bitcoin'),
+              CoinCard(
+                  key: keyETH,
+                  coinNameMbtc: 'ETH',
+                  coinNameInternacional: 'ethereum'),
+              CoinCard(
+                  key: keyLTC,
+                  coinNameMbtc: 'LTC',
+                  coinNameInternacional: 'litecoin'),
+              CoinCard(
+                key: keyXRP,
+                coinNameMbtc: 'XRP',
+                coinNameInternacional: 'ripple',
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 20,
+          )
+        ]),
+      ),
     );
   }
 }
