@@ -32,13 +32,13 @@ ThemeData light = ThemeData(
 ThemeData dark = ThemeData(
   brightness: Brightness.dark,
   primaryColor: Color(0xFF202022),
-  accentColor: Colors.amberAccent,
+  accentColor: Colors.amberAccent[100],
   scaffoldBackgroundColor: Color(0xFF202022),
   cardTheme: CardTheme(
-    color: Color(0xFF303032),
+    color: Color(0xFF29292B),
   ),
   dialogTheme: DialogTheme(
-    backgroundColor: Color(0xFF303032),
+    backgroundColor: Color(0xFF29292B),
   ),
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
     selectedIconTheme: IconThemeData(color: Color(0xFFA590D5)),
@@ -50,7 +50,7 @@ ThemeData dark = ThemeData(
 
   bottomAppBarColor: Color(0xFF151517),
   accentTextTheme: TextTheme(
-    headline1: TextStyle(color:Colors.amberAccent),
+    headline1: TextStyle(color:Colors.amberAccent[100]),
     headline2: TextStyle(color: Color(0xFF000000)),
   ),
 );
