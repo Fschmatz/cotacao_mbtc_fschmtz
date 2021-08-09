@@ -3,6 +3,7 @@ import 'package:cotacao_mbtc_fschmtz/class/coinMBTC.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 class CoinCard extends StatefulWidget {
   String coinNameMbtc;
@@ -27,6 +28,7 @@ class _CoinCardState extends State<CoinCard> {
   bool loading = true;
   TextStyle valuesStyle = TextStyle(fontSize: 16);
   double valorDolar = 0;
+  String horaFormatada = ' ';
 
   @override
   void initState() {
@@ -34,43 +36,55 @@ class _CoinCardState extends State<CoinCard> {
         'https://www.mercadobitcoin.net/api/${widget.coinNameMbtc}/ticker/';
     urlCoinApiInternacional =
         'https://api.coinstats.app/public/v1/coins/${widget.coinNameInternacional}?currency=USD';
-   //valorDolar = double.parse(widget.valorCotacaoDolar);
+    horaFormatada = getHoraFormatada();
     getCoinData();
     super.initState();
   }
 
+  String getHoraFormatada(){
+    return DateFormat.Hm().format(DateTime.now());
+  }
+
   Future<void> getCoinData() async {
+
+    bool doneMbtc = false;
+    bool doneInternacional = false;
+
     final responseMbtc = await http.get(Uri.parse(urlCoinApiMbtc));
     final responseInternacional =
         await http.get(Uri.parse(urlCoinApiInternacional));
     if (responseMbtc.statusCode == 200) {
+      doneMbtc = true;
       CoinMBTC dataMbtc = CoinMBTC.fromJSON(jsonDecode(responseMbtc.body));
       setState(() {
         coinMbtc = dataMbtc;
       });
     }
     if (responseInternacional.statusCode == 200) {
+      doneInternacional = true;
       CoinInternacional dataInternacional =
           CoinInternacional.fromJSON(jsonDecode(responseInternacional.body));
       setState(() {
         coinInternacional = dataInternacional;
       });
     }
-    setState(() {
-      loading = false;
-    });
+    if(doneMbtc && doneInternacional){
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   String getFormattedValueInternacional() {
     //String valueFormatted;
     if (coinInternacional.name == 'bitcoin') {
-      return coinInternacional.value.substring(0, (coinMbtc.last.length - 7));
+      return coinInternacional.value.substring(0, (coinInternacional.value.length - 9));
     } else if (coinInternacional.name == 'ethereum') {
-      return coinInternacional.value.substring(0, (coinMbtc.last.length - 7));
+      return coinInternacional.value.substring(0, (coinInternacional.value.length - 10));
     } else if (coinInternacional.name == 'litecoin') {
-      return coinInternacional.value.substring(0, (coinMbtc.last.length - 6));
+      return coinInternacional.value.substring(0, (coinInternacional.value.length - 12));
     } else {
-      return coinInternacional.value.substring(0, (coinMbtc.last.length - 4));
+      return coinInternacional.value.substring(0, (coinInternacional.value.length - 12));
     }
   }
 
@@ -88,21 +102,15 @@ class _CoinCardState extends State<CoinCard> {
           children: [
             ListTile(
               title: Text(widget.coinNameMbtc,
-                  //textAlign: TextAlign.center,
                   style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: Theme.of(context).accentColor)),
             ),
             AnimatedSwitcher(
               duration: Duration(milliseconds: 600),
               child: loading
-                  ? Container(
-                      height: 150,
-                      child: Center(
-                          child: CircularProgressIndicator(
-                        color: Theme.of(context).accentColor,
-                      )))
+                  ? Center(child: SizedBox.shrink())
                   : Column(
                       children: [
                         ListTile(
@@ -127,13 +135,13 @@ class _CoinCardState extends State<CoinCard> {
                           ),
                         ),
                         ListTile(
-                          title: Text(
-                            'U\$ -> R\$',
-                            style: valuesStyle,
-                          ),
                           trailing: Text(
-                            '666',
-                            style: valuesStyle,
+                            horaFormatada,
+                            style: TextStyle(fontSize: 14,color: Theme.of(context)
+                                .textTheme
+                                .headline6!
+                                .color!
+                                .withOpacity(0.5),),
                           ),
                         ),
                       ],

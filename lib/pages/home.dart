@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cotacao_mbtc_fschmtz/class/dolar.dart';
 import 'package:cotacao_mbtc_fschmtz/configs/pgConfigs.dart';
 import 'package:cotacao_mbtc_fschmtz/widgets/coinCard.dart';
@@ -12,19 +11,18 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   //DOCS -> https://www.mercadobitcoin.com.br/api-doc/
   //INTERNACIONAL COIN STATS -> https://documenter.getpostman.com/view/5734027/RzZ6Hzr3?version=latest
   //DOLAR https://docs.awesomeapi.com.br/api-de-moedas
 
-  bool loadingDolar = true;
+  bool loadingHome = true;
   String urlApiDolar = 'https://economia.awesomeapi.com.br/last/USD-BRL';
   late Dolar _dolar;
-  String valorDolarCalculado = '';
+  String valorDolarCalculado = ' ';
 
   @override
   void initState() {
-   getValorDolar();
+    getValorDolar();
     super.initState();
   }
 
@@ -42,9 +40,9 @@ class _HomeState extends State<Home> {
         coinNameMbtc: 'LTC',
         coinNameInternacional: 'litecoin'),
     CoinCard(
-        key: UniqueKey(),
-        coinNameMbtc: 'XRP',
-        coinNameInternacional: 'ripple',
+      key: UniqueKey(),
+      coinNameMbtc: 'XRP',
+      coinNameInternacional: 'ripple',
     ),
   ];
 
@@ -55,18 +53,19 @@ class _HomeState extends State<Home> {
       Dolar dataDolar = Dolar.fromJSON(jsonDecode(response.body));
       setState(() {
         _dolar = dataDolar;
-        valorDolarCalculado = ((double.parse(_dolar.high) + double.parse(_dolar.low)) / 2).toStringAsFixed(2);
-        loadingDolar = false;
+        valorDolarCalculado =
+            ((double.parse(_dolar.high) + double.parse(_dolar.low)) / 2)
+                .toStringAsFixed(2);
+        loadingHome = false;
       });
     }
   }
 
-  Widget dolarCard(){
-
-    String valorDolarFormatado = 'R\$ '+valorDolarCalculado;
+  Widget dolarCard() {
+    String valorDolarFormatado = 'R\$ ' + valorDolarCalculado;
 
     return Card(
-      margin: const EdgeInsets.fromLTRB(16, 5, 16, 5),
+      margin: const EdgeInsets.fromLTRB(16, 10, 16, 5),
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -74,18 +73,26 @@ class _HomeState extends State<Home> {
       child: InkWell(
         onTap: getValorDolar,
         borderRadius: BorderRadius.all(Radius.circular(20)),
-        child: AnimatedSwitcher(
-          duration: Duration(milliseconds: 600),
-          child: loadingDolar
-              ? Container(height: 55,child: Center(child: CircularProgressIndicator(color: Theme.of(context).accentColor,)))
-              : ListTile(
-                title: Text(
-                  'Cotação do Dólar',
-                ),
-                trailing:Text(
-                  valorDolarFormatado,style: TextStyle(fontSize: 16),
-                ),
-              ),
+        child: Container(
+          height: 55,
+          child: AnimatedSwitcher(
+            duration: Duration(milliseconds: 600),
+            child: loadingHome
+                ? Center(child: SizedBox.shrink())
+                : ListTile(
+                    title: Text(
+                      'Dólar'.toUpperCase(),
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: Theme.of(context).accentColor),
+                    ),
+                    trailing: Text(
+                      valorDolarFormatado,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+          ),
         ),
       ),
     );
@@ -97,6 +104,19 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         elevation: 0,
         title: Text('Cotação MBTC + Internacional'),
+        bottom: PreferredSize(
+            preferredSize: Size(double.infinity, 3),
+            child: loadingHome
+                ? LinearProgressIndicator(
+                    minHeight: 3,
+                    valueColor: new AlwaysStoppedAnimation<Color>(
+                        Theme.of(context).accentColor.withOpacity(0.8)),
+                    backgroundColor:
+                        Theme.of(context).accentColor.withOpacity(0.3),
+                  )
+                : SizedBox(
+                    height: 3,
+                  )),
         actions: [
           IconButton(
               icon: Icon(
@@ -118,11 +138,12 @@ class _HomeState extends State<Home> {
         ],
       ),
       body: ListView(physics: AlwaysScrollableScrollPhysics(), children: [
+        dolarCard(),
         GridView.count(
           shrinkWrap: true,
           primary: false,
           padding: const EdgeInsets.fromLTRB(12, 5, 12, 5),
-          childAspectRatio: 0.84,
+          childAspectRatio: 0.87,
           crossAxisSpacing: 2,
           mainAxisSpacing: 5,
           crossAxisCount: 2,
@@ -133,7 +154,6 @@ class _HomeState extends State<Home> {
             _coinCards[3],
           ],
         ),
-        dolarCard(),
         const SizedBox(
           height: 20,
         )
