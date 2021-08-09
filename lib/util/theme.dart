@@ -35,10 +35,10 @@ ThemeData dark = ThemeData(
   accentColor: Colors.amberAccent[100],
   scaffoldBackgroundColor: Color(0xFF202022),
   cardTheme: CardTheme(
-    color: Color(0xFF29292B),
+    color: Color(0xFF2B2B2D),
   ),
   dialogTheme: DialogTheme(
-    backgroundColor: Color(0xFF29292B),
+    backgroundColor: Color(0xFF2B2B2D),
   ),
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
     selectedIconTheme: IconThemeData(color: Color(0xFFA590D5)),

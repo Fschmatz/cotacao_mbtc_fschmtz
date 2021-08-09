@@ -36,7 +36,6 @@ class _CoinCardState extends State<CoinCard> {
         'https://www.mercadobitcoin.net/api/${widget.coinNameMbtc}/ticker/';
     urlCoinApiInternacional =
         'https://api.coinstats.app/public/v1/coins/${widget.coinNameInternacional}?currency=USD';
-    horaFormatada = getHoraFormatada();
     getCoinData();
     super.initState();
   }
@@ -46,7 +45,7 @@ class _CoinCardState extends State<CoinCard> {
   }
 
   Future<void> getCoinData() async {
-
+    horaFormatada = getHoraFormatada();
     bool doneMbtc = false;
     bool doneInternacional = false;
 

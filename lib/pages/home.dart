@@ -143,7 +143,7 @@ class _HomeState extends State<Home> {
           shrinkWrap: true,
           primary: false,
           padding: const EdgeInsets.fromLTRB(12, 5, 12, 5),
-          childAspectRatio: 0.87,
+          childAspectRatio: 0.84,
           crossAxisSpacing: 2,
           mainAxisSpacing: 5,
           crossAxisCount: 2,
