@@ -1,6 +1,6 @@
 import 'package:dynamic_value/dynamic_value.dart';
 
-class CoinMBTC {
+class CryptoMBTC {
   final String high;
   final String low;
   final String vol;
@@ -9,7 +9,7 @@ class CoinMBTC {
   final String sell;
   final String open;
 
-  CoinMBTC({
+  CryptoMBTC({
     required this.high,
     required this.low,
     required this.vol,
@@ -19,11 +19,11 @@ class CoinMBTC {
     required this.open
   });
 
-  factory CoinMBTC.fromJSON(dynamic json) {
+  factory CryptoMBTC.fromJSON(dynamic json) {
 
     final value = DynamicValue(json);
 
-    return CoinMBTC(
+    return CryptoMBTC(
       high: value['ticker']['high'].toString(),
       low:  value['ticker']['low'].toString(),
       vol:  value['ticker']['vol'].toString(),

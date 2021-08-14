@@ -1,35 +1,37 @@
-import 'package:cotacao_mbtc_fschmtz/class/coinInternacional.dart';
-import 'package:cotacao_mbtc_fschmtz/class/coinMBTC.dart';
+import 'package:cotacao_mbtc_fschmtz/class/cryptoInternacional.dart';
+import 'package:cotacao_mbtc_fschmtz/class/cryptoMBTC.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
 
-class CoinCard extends StatefulWidget {
+class CryptoCard extends StatefulWidget {
   String coinNameMbtc;
   String coinNameInternacional;
 
-  CoinCard(
+  CryptoCard(
       {Key? key,
       required this.coinNameMbtc,
       required this.coinNameInternacional})
       : super(key: key);
 
   @override
-  _CoinCardState createState() => _CoinCardState();
+  _CryptoCardState createState() => _CryptoCardState();
 }
 
-class _CoinCardState extends State<CoinCard> {
+class _CryptoCardState extends State<CryptoCard> {
 
-  late CoinMBTC coinMbtc;
-  late CoinInternacional coinInternacional;
+  late CryptoMBTC coinMbtc;
+  late CryptoInternacional coinInternacional;
   String urlCoinApiMbtc = '';
   String urlCoinApiInternacional = '';
   bool loading = true;
   TextStyle valuesStyle = TextStyle(fontSize: 16);
   String horaFormatada = ' ';
-  Color corMudancasValor = Colors.transparent;
   NumberFormat formatter = NumberFormat.simpleCurrency(locale: 'pt_BR');
+  Icon iconSetaDefault = Icon(Icons.circle,color: Colors.transparent,size: 18,);
+  Icon iconSetaUp = Icon(Icons.arrow_upward_outlined,color: Colors.green,size: 18,);
+  Icon iconSetaDown = Icon(Icons.arrow_downward_outlined,color: Colors.red,size: 18,);
 
   @override
   void initState() {
@@ -55,15 +57,15 @@ class _CoinCardState extends State<CoinCard> {
         await http.get(Uri.parse(urlCoinApiInternacional));
     if (responseMbtc.statusCode == 200) {
       doneMbtc = true;
-      CoinMBTC dataMbtc = CoinMBTC.fromJSON(jsonDecode(responseMbtc.body));
+      CryptoMBTC dataMbtc = CryptoMBTC.fromJSON(jsonDecode(responseMbtc.body));
       setState(() {
 
         if(checkParaCor) {
           if (double.parse(coinMbtc.last) < double.parse(dataMbtc.last)) {
-            corMudancasValor = Colors.green;
+            iconSetaDefault = iconSetaUp;
           }
           else if (double.parse(coinMbtc.last) > double.parse(dataMbtc.last)) {
-            corMudancasValor = Colors.red;
+            iconSetaDefault = iconSetaDown;
           }
         }
         coinMbtc = dataMbtc;
@@ -71,8 +73,8 @@ class _CoinCardState extends State<CoinCard> {
     }
     if (responseInternacional.statusCode == 200) {
       doneInternacional = true;
-      CoinInternacional dataInternacional =
-          CoinInternacional.fromJSON(jsonDecode(responseInternacional.body));
+      CryptoInternacional dataInternacional =
+          CryptoInternacional.fromJSON(jsonDecode(responseInternacional.body));
       setState(() {
         coinInternacional = dataInternacional;
       });
@@ -140,8 +142,8 @@ class _CoinCardState extends State<CoinCard> {
                         ListTile(
                           visualDensity: VisualDensity.compact,
                           leading: Padding(
-                            padding: const EdgeInsets.fromLTRB(6, 8, 10, 5),
-                            child: Icon(Icons.circle,size: 10,color: corMudancasValor),
+                            padding: const EdgeInsets.fromLTRB(2, 0, 0, 0),
+                            child: iconSetaDefault,
                           ),
                           trailing: Text(
                             horaFormatada,
@@ -152,6 +154,16 @@ class _CoinCardState extends State<CoinCard> {
                                 .withOpacity(0.5),),
                           ),
                         ),
+                       /* Visibility(
+                          visible: widget.coinNameMbtc == 'ETH' ||  widget.coinNameMbtc == 'XRP',
+                          child: ListTile(
+                            leading: Icon(Icons.account_balance_wallet_outlined,size: 20,),
+                            trailing: Text(
+                              getFormattedValueInternacional(),
+                              style: valuesStyle,
+                            ),
+                          ),
+                        ),*/
                       ],
                     ),
             ),

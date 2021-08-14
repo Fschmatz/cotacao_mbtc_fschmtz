@@ -1,16 +1,20 @@
 class Changelog{
 
-  static String appVersion = "1.1.0";
+  static String appVersion = "1.2.0";
   static String appName = "MBTC + Internacional";
 
   static String changelogCurrent = '''  
+1.2.0
+- Add Euro
+- Add Setas de Alta e Baixa do Valor
+''';
+
+  static String changelogsOld = '''
 1.1.0
 - Swipe Down Refresh Home
 - Formatação Valores Padrão PT-BR
 - Correções
-''';
 
-  static String changelogsOld = '''
 1.0.0
 - Tecnicamente Usável  
 - Mudanças na Home

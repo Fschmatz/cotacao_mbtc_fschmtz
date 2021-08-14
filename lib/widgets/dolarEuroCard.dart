@@ -1,27 +1,28 @@
-import 'package:cotacao_mbtc_fschmtz/class/coinInternacional.dart';
-import 'package:cotacao_mbtc_fschmtz/class/coinMBTC.dart';
-import 'package:cotacao_mbtc_fschmtz/class/dolar.dart';
+import 'package:cotacao_mbtc_fschmtz/class/moedaInternacional.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
 
-class DolarCard extends StatefulWidget {
+class DolarEuroCard extends StatefulWidget {
 
   Function() stopLoadHome;
-  DolarCard({Key? key,required this.stopLoadHome}) : super(key: key);
+  DolarEuroCard({Key? key,required this.stopLoadHome}) : super(key: key);
 
   @override
-  _DolarCardState createState() => _DolarCardState();
+  _DolarEuroCardState createState() => _DolarEuroCardState();
 }
 
-class _DolarCardState extends State<DolarCard> {
+class _DolarEuroCardState extends State<DolarEuroCard> {
 
   bool loading = true;
   String horaFormatada = ' ';
-  late Dolar _dolar;
+  late MoedaInternacional _dolar;
+  late MoedaInternacional _euro;
   String valorDolarCalculado = ' ';
+  String valorEuroCalculado = ' ';
   String urlApiDolar = 'https://economia.awesomeapi.com.br/last/USD-BRL';
+  String urlApiEuro = 'https://economia.awesomeapi.com.br/last/EUR-BRL';
   NumberFormat formatter = NumberFormat.simpleCurrency(locale: 'pt_BR');
 
   @override
@@ -41,14 +42,27 @@ class _DolarCardState extends State<DolarCard> {
 
   Future<void> getValorDolar() async {
     final response = await http.get(Uri.parse(urlApiDolar));
-
     if (response.statusCode == 200) {
-      Dolar dataDolar = Dolar.fromJSON(jsonDecode(response.body));
+      MoedaInternacional dataDolar = MoedaInternacional.fromJSON(jsonDecode(response.body),'USDBRL');
       setState(() {
         _dolar = dataDolar;
-
         valorDolarCalculado =
             ((double.parse(_dolar.high) + double.parse(_dolar.low)) / 2)
+                .toStringAsFixed(2);
+      });
+    }
+    getValorEuro();
+  }
+
+  Future<void> getValorEuro() async {
+    final response = await http.get(Uri.parse(urlApiEuro));
+
+    if (response.statusCode == 200) {
+      MoedaInternacional dataEuro = MoedaInternacional.fromJSON(jsonDecode(response.body),'EURBRL');
+      setState(() {
+        _euro = dataEuro;
+        valorEuroCalculado =
+            ((double.parse(_euro.high) + double.parse(_euro.low)) / 2)
                 .toStringAsFixed(2);
         loading = false;
       });
@@ -56,8 +70,8 @@ class _DolarCardState extends State<DolarCard> {
     widget.stopLoadHome();
   }
 
-  String getFormattedValueDolar() {
-    return (formatter.format(double.parse(valorDolarCalculado)));
+  String getFormattedValueMoeda(String value) {
+    return (formatter.format(double.parse(value)));
   }
 
   @override
@@ -73,7 +87,7 @@ class _DolarCardState extends State<DolarCard> {
         onTap: getValorDolar,
         borderRadius: BorderRadius.all(Radius.circular(20)),
         child: Container(
-          height: 100,
+          height: 165,
           child: AnimatedSwitcher(
             duration: Duration(milliseconds: 600),
             child: loading
@@ -81,7 +95,6 @@ class _DolarCardState extends State<DolarCard> {
                 : Column(
                   children: [
                     ListTile(
-
                         title: Text(
                           'Dólar'.toUpperCase(),
                           style: TextStyle(
@@ -90,10 +103,23 @@ class _DolarCardState extends State<DolarCard> {
                               color: Theme.of(context).accentColor),
                         ),
                         trailing: Text(
-                          getFormattedValueDolar(),
+                          getFormattedValueMoeda(valorDolarCalculado),
                           style: TextStyle(fontSize: 16),
                         ),
                       ),
+                    ListTile(
+                      title: Text(
+                        'Euro'.toUpperCase(),
+                        style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: Theme.of(context).accentColor),
+                      ),
+                      trailing: Text(
+                        getFormattedValueMoeda(valorEuroCalculado),
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
                     ListTile(
                       visualDensity: VisualDensity.compact,
                       dense: true,

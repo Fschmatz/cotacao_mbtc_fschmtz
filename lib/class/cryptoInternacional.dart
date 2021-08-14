@@ -1,19 +1,19 @@
 import 'package:dynamic_value/dynamic_value.dart';
 
-class CoinInternacional {
+class CryptoInternacional {
   final String name;
   final String value;
 
-  CoinInternacional({
+  CryptoInternacional({
     required this.name,
     required this.value
   });
 
-  factory CoinInternacional.fromJSON(dynamic json) {
+  factory CryptoInternacional.fromJSON(dynamic json) {
 
     final value = DynamicValue(json);
 
-    return CoinInternacional(
+    return CryptoInternacional(
         name: value['coin']['id'].toString(),
         value:  value['coin']['price'].toString()
     );
