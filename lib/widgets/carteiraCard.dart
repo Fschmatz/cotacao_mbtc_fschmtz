@@ -6,11 +6,11 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 
 class CarteiraCard extends StatefulWidget {
-  List<String> coinNameMbtc;
+
+  String coinNameMbtc;
 
   CarteiraCard(
-      {Key? key,
-        required this.coinNameMbtc})
+      {Key? key,required this.coinNameMbtc})
       : super(key: key);
 
   @override
@@ -44,11 +44,9 @@ class _CarteiraCardState extends State<CarteiraCard> {
   Future<void> getCoinData(bool checkParaCor) async {
     horaFormatada = getHoraFormatada();
     bool doneMbtc = false;
-    bool doneInternacional = false;
 
     final responseMbtc = await http.get(Uri.parse(urlCoinApiMbtc));
-    final responseInternacional =
-    await http.get(Uri.parse(urlCoinApiInternacional));
+
     if (responseMbtc.statusCode == 200) {
       doneMbtc = true;
       CryptoMBTC dataMbtc = CryptoMBTC.fromJSON(jsonDecode(responseMbtc.body));
@@ -63,61 +61,70 @@ class _CarteiraCardState extends State<CarteiraCard> {
     }
   }
 
-  String getFormattedValueMbtc() {
+  //TEMPORARIO
+  String getFormattedValueMbtcCalculado() {
     return (formatter.format(double.parse(coinMbtc.last))).replaceAll('R\$', '');
-  }
-
-  String getFormattedValueInternacional() {
-    return (formatter.format(double.parse(coinInternacional.value))).replaceAll('R\$', '');
   }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-      ),
-      child: InkWell(
-        onTap: () => getCoinData(true),
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-        child: Column(
-          children: [
-            ListTile(
-              title: Text('Carteira'.toUpperCase(),
-                  style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: Theme.of(context).accentColor)),
-            ),
-            AnimatedSwitcher(
-              duration: Duration(milliseconds: 600),
-              child: loading
-                  ? Center(child: SizedBox.shrink())
-                  : Column(
-                children: [
-                  ListTile(
-                    title: Text(
-                      'R\$',
-                      style: valuesStyle,
-                    ),
-                    trailing: Text(
-                      getFormattedValueMbtc(),
-                      style: valuesStyle,
-                    ),
-                  ),
-                  ListTile(
-                    title: Icon(Icons.account_balance_wallet_outlined),
-                    trailing: Text(
-                      getFormattedValueInternacional(),
-                      style: valuesStyle,
-                    ),
-                  ),
-
-                ],
+    return Container(
+      height: 170,
+      child: Card(
+        margin: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+        ),
+        child: InkWell(
+          onTap: () => getCoinData(true),
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+          child: Column(
+            children: [
+              ListTile(
+                title: Text(widget.coinNameMbtc.toUpperCase(),
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Theme.of(context).accentColor)),
               ),
-            ),
-          ],
+              AnimatedSwitcher(
+                duration: Duration(milliseconds: 600),
+                child: loading
+                    ? Center(child: SizedBox.shrink())
+                    : Column(
+                  children: [
+                    ListTile(
+                      title: Text(
+                        'R\$',
+                        style: valuesStyle,
+                      ),
+                      trailing: Text(
+                        getFormattedValueMbtcCalculado(),
+                        style: valuesStyle,
+                      ),
+                    ),
+                    ListTile(
+                      visualDensity: VisualDensity.compact,
+                      dense: true,
+                      trailing: Text(
+                        getHoraFormatada(),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(context)
+                              .textTheme
+                              .headline6!
+                              .color!
+                              .withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

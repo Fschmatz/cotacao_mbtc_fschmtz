@@ -5,16 +5,15 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 
 class DolarEuroCard extends StatefulWidget {
+  Function() loadAnimationHome;
 
-  Function() stopLoadHome;
-  DolarEuroCard({Key? key,required this.stopLoadHome}) : super(key: key);
+  DolarEuroCard({Key? key, required this.loadAnimationHome}) : super(key: key);
 
   @override
   _DolarEuroCardState createState() => _DolarEuroCardState();
 }
 
 class _DolarEuroCardState extends State<DolarEuroCard> {
-
   bool loading = true;
   String horaFormatada = ' ';
   late MoedaInternacional _dolar;
@@ -35,15 +34,14 @@ class _DolarEuroCardState extends State<DolarEuroCard> {
     DateTime now = DateTime.now();
     var outputFormat = DateFormat('dd/MM/yyyy');
     var formatDate = outputFormat.format(now);
-
-    return formatDate +'  '+ (DateFormat.Hm().format(now));
-
+    return formatDate + '  ' + (DateFormat.Hm().format(now));
   }
 
   Future<void> getValorDolar() async {
     final response = await http.get(Uri.parse(urlApiDolar));
     if (response.statusCode == 200) {
-      MoedaInternacional dataDolar = MoedaInternacional.fromJSON(jsonDecode(response.body),'USDBRL');
+      MoedaInternacional dataDolar =
+          MoedaInternacional.fromJSON(jsonDecode(response.body), 'USDBRL');
       setState(() {
         _dolar = dataDolar;
         valorDolarCalculado =
@@ -58,7 +56,8 @@ class _DolarEuroCardState extends State<DolarEuroCard> {
     final response = await http.get(Uri.parse(urlApiEuro));
 
     if (response.statusCode == 200) {
-      MoedaInternacional dataEuro = MoedaInternacional.fromJSON(jsonDecode(response.body),'EURBRL');
+      MoedaInternacional dataEuro =
+          MoedaInternacional.fromJSON(jsonDecode(response.body), 'EURBRL');
       setState(() {
         _euro = dataEuro;
         valorEuroCalculado =
@@ -67,7 +66,7 @@ class _DolarEuroCardState extends State<DolarEuroCard> {
         loading = false;
       });
     }
-    widget.stopLoadHome();
+    widget.loadAnimationHome();
   }
 
   String getFormattedValueMoeda(String value) {
@@ -76,7 +75,6 @@ class _DolarEuroCardState extends State<DolarEuroCard> {
 
   @override
   Widget build(BuildContext context) {
-
     return Card(
       margin: const EdgeInsets.fromLTRB(16, 10, 16, 6),
       elevation: 0,
@@ -87,14 +85,14 @@ class _DolarEuroCardState extends State<DolarEuroCard> {
         onTap: getValorDolar,
         borderRadius: BorderRadius.all(Radius.circular(20)),
         child: Container(
-          height: 165,
+          height: 160,
           child: AnimatedSwitcher(
             duration: Duration(milliseconds: 600),
             child: loading
                 ? Center(child: SizedBox.shrink())
                 : Column(
-                  children: [
-                    ListTile(
+                    children: [
+                      ListTile(
                         title: Text(
                           'Dólar'.toUpperCase(),
                           style: TextStyle(
@@ -107,33 +105,36 @@ class _DolarEuroCardState extends State<DolarEuroCard> {
                           style: TextStyle(fontSize: 16),
                         ),
                       ),
-                    ListTile(
-                      title: Text(
-                        'Euro'.toUpperCase(),
-                        style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: Theme.of(context).accentColor),
+                      ListTile(
+                        title: Text(
+                          'Euro'.toUpperCase(),
+                          style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: Theme.of(context).accentColor),
+                        ),
+                        trailing: Text(
+                          getFormattedValueMoeda(valorEuroCalculado),
+                          style: TextStyle(fontSize: 16),
+                        ),
                       ),
-                      trailing: Text(
-                        getFormattedValueMoeda(valorEuroCalculado),
-                        style: TextStyle(fontSize: 16),
+                      ListTile(
+                        visualDensity: VisualDensity.compact,
+                        dense: true,
+                        trailing: Text(
+                          getHoraFormatada(),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Theme.of(context)
+                                .textTheme
+                                .headline6!
+                                .color!
+                                .withOpacity(0.5),
+                          ),
+                        ),
                       ),
-                    ),
-                    ListTile(
-                      visualDensity: VisualDensity.compact,
-                      dense: true,
-                      trailing: Text(
-                        getHoraFormatada(),
-                        style: TextStyle(fontSize: 14,color: Theme.of(context)
-                            .textTheme
-                            .headline6!
-                            .color!
-                            .withOpacity(0.5),),
-                      ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
           ),
         ),
       ),

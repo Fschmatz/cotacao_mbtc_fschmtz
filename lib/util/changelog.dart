@@ -1,15 +1,19 @@
 class Changelog{
 
-  static String appVersion = "1.2.0";
+  static String appVersion = "1.3.0";
   static String appName = "MBTC + Internacional";
 
   static String changelogCurrent = '''  
-1.2.0
-- Add Euro
-- Add Setas de Alta e Baixa do Valor
+1.3.0
+- Add NavBar
+- Add Carteira
 ''';
 
   static String changelogsOld = '''
+1.2.0
+- Add Euro
+- Add Setas de Alta e Baixa do Valor
+
 1.1.0
 - Swipe Down Refresh Home
 - Formatação Valores Padrão PT-BR

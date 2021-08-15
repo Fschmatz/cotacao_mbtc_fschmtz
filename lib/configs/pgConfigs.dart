@@ -18,10 +18,6 @@ class _PgConfigsState extends State<PgConfigs> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Configurações"),
-          elevation: 0.0,
-        ),
         body: ListView(
           children: <Widget>[
             Card(

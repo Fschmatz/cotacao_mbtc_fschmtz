@@ -1,11 +1,8 @@
-import 'dart:convert';
-import 'package:cotacao_mbtc_fschmtz/class/moedaInternacional.dart';
 import 'package:cotacao_mbtc_fschmtz/configs/pgConfigs.dart';
-import 'package:cotacao_mbtc_fschmtz/widgets/carteiraCard.dart';
-import 'package:cotacao_mbtc_fschmtz/widgets/cryptoCard.dart';
-import 'package:cotacao_mbtc_fschmtz/widgets/dolarEuroCard.dart';
+import 'package:cotacao_mbtc_fschmtz/pages/pgCarteira.dart';
+import 'package:cotacao_mbtc_fschmtz/pages/pgValores.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:google_nav_bar/google_nav_bar.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -17,35 +14,33 @@ class _HomeState extends State<Home> {
   //INTERNACIONAL COIN STATS -> https://documenter.getpostman.com/view/5734027/RzZ6Hzr3?version=latest
   //DOLAR https://docs.awesomeapi.com.br/api-de-moedas
 
+  int _currentIndex = 0;
+  late List<Widget> _pageList;
   bool loadingHome = true;
-  Key keyBTC = UniqueKey();
-  Key keyETH = UniqueKey();
-  Key keyLTC = UniqueKey();
-  Key keyXRP = UniqueKey();
-  List<String> listCarteira = ['ETH','XRP'];
 
-  void stopLoadHome() {
+  void loadAnimationHome() {
     setState(() {
-      loadingHome = false;
-    });
-  }
-
-  Future<void> refreshAll() async{
-    setState(() {
-      keyBTC = UniqueKey();
-      keyETH = UniqueKey();
-      keyLTC = UniqueKey();
-      keyXRP = UniqueKey();
+      loadingHome = !loadingHome;
     });
   }
 
   @override
+  void initState() {
+    _pageList = [PgValores(loadAnimationHome: loadAnimationHome),PgCarteira(),PgConfigs()];
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+
+    TextStyle styleFontNavBar =
+    TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: Theme.of(context).accentColor);
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         title: Text('Cotação MBTC + Internacional'),
-        bottom: PreferredSize(
+       /* bottom: PreferredSize(
             preferredSize: Size(double.infinity, 3),
             child: loadingHome
                 ? LinearProgressIndicator(
@@ -57,67 +52,59 @@ class _HomeState extends State<Home> {
                   )
                 : SizedBox(
                     height: 3,
-                  )),
-        actions: [
-          IconButton(
-              icon: Icon(
-                Icons.settings_outlined,
-                color: Theme.of(context)
-                    .textTheme
-                    .headline6!
-                    .color!
-                    .withOpacity(0.8),
-              ),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (BuildContext context) => PgConfigs(),
-                      fullscreenDialog: true,
-                    ));
-              }),
-        ],
+                  )),*/
       ),
-      body: RefreshIndicator(
-        onRefresh: refreshAll,
-        color: Theme.of(context).accentColor,
-        child: ListView(physics: AlwaysScrollableScrollPhysics(), children: [
-          DolarEuroCard(
-            stopLoadHome: stopLoadHome,
+      body: _pageList[_currentIndex],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).bottomNavigationBarTheme.backgroundColor!,
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 8),
+            child: GNav(
+              rippleColor: Theme.of(context).accentColor.withOpacity(0.4),
+              hoverColor: Theme.of(context).accentColor.withOpacity(0.4),
+              color: Theme.of(context)
+                  .textTheme
+                  .headline6!
+                  .color!
+                  .withOpacity(0.8),
+              gap: 5,
+              activeColor: Theme.of(context).accentColor,
+              iconSize: 24,
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              duration: Duration(milliseconds: 500),
+              tabBackgroundColor:
+              Theme.of(context).accentColor.withOpacity(0.3),
+              backgroundColor:
+              Theme.of(context).bottomNavigationBarTheme.backgroundColor!,
+              tabs: [
+                GButton(
+                  icon: Icons.bar_chart_outlined,
+                  text: 'Valores',
+                  textStyle: styleFontNavBar,
+                ),
+                GButton(
+                  icon: Icons.payment_outlined,
+                  text: 'Carteira',
+                  textStyle: styleFontNavBar,
+                ),
+                GButton(
+                  icon: Icons.settings_outlined,
+                  text: 'Configurações',
+                  textStyle: styleFontNavBar,
+                ),
+              ],
+              selectedIndex: _currentIndex,
+              onTabChange: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+            ),
           ),
-          GridView.count(
-            shrinkWrap: true,
-            primary: false,
-            padding: const EdgeInsets.fromLTRB(12, 5, 12, 5),
-            childAspectRatio: 0.85,
-            crossAxisSpacing: 4,
-            mainAxisSpacing: 6,
-            crossAxisCount: 2,
-            children: <Widget>[
-              CryptoCard(
-                  key: keyBTC,
-                  coinNameMbtc: 'BTC',
-                  coinNameInternacional: 'bitcoin'),
-              CryptoCard(
-                  key: keyETH,
-                  coinNameMbtc: 'ETH',
-                  coinNameInternacional: 'ethereum'),
-              CryptoCard(
-                  key: keyLTC,
-                  coinNameMbtc: 'LTC',
-                  coinNameInternacional: 'litecoin'),
-              CryptoCard(
-                key: keyXRP,
-                coinNameMbtc: 'XRP',
-                coinNameInternacional: 'ripple',
-              ),
-            ],
-          ),
-
-          const SizedBox(
-            height: 20,
-          )
-        ]),
+        ),
       ),
     );
   }
